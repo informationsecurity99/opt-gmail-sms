@@ -1,0 +1,375 @@
+definitions:
+  models.ConfirmOtpRequest:
+    properties:
+      code:
+        type: string
+      otp_id:
+        type: string
+    type: object
+  models.CreateRole:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  models.CreateSysUser:
+    properties:
+      name:
+        description: Foydalanuvchi ismi
+        type: string
+      password:
+        description: Parol
+        type: string
+      phone:
+        description: Telefon raqami (login uchun)
+        type: string
+      roles:
+        description: Role ID lar
+        items:
+          type: string
+        type: array
+    required:
+    - name
+    - password
+    - phone
+    - roles
+    type: object
+  models.CreateUser:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      otp_confirmation_token:
+        description: ✅ TO‘G‘RI
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - name
+    - otp_confirmation_token
+    - password
+    type: object
+  models.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      user_type:
+        description: '"user" (default) | "sysuser"'
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  models.Response:
+    properties:
+      data: {}
+      description:
+        type: string
+      statusCode:
+        type: integer
+    type: object
+  models.Role:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  models.RoleListResponse:
+    properties:
+      roles:
+        items:
+          $ref: '#/definitions/models.Role'
+        type: array
+    type: object
+  models.SendOtpRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  models.UpdateRole:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Authentication and Authorization API
+  title: Auth API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: User login with email and password
+      parameters:
+      - description: Login credentials
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Login user
+      tags:
+      - auth
+  /otp/confirm:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: otp info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConfirmOtpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Confirm OTP code
+      tags:
+      - otp
+  /otp/send:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: email info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SendOtpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Send OTP to email
+      tags:
+      - otp
+  /role:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: role
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateRole'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Create role
+      tags:
+      - role
+  /role/{id}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: role_id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: update info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Update role
+      tags:
+      - role
+  /roles:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RoleListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: List all roles
+      tags:
+      - role
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user after OTP confirmation
+      parameters:
+      - description: Signup data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Create new user
+      tags:
+      - auth
+  /sysuser:
+    post:
+      consumes:
+      - application/json
+      description: Superadmin tomonidan tizim user (admin, buxgalter) yaratish
+      parameters:
+      - description: sysuser info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateSysUser'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Create system user
+      tags:
+      - sysuser
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

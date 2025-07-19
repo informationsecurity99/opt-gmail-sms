@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS sysuser_roles;
+DROP TABLE IF EXISTS sysusers;
+DROP TABLE IF EXISTS roles;
+DROP TABLE IF EXISTS otps;
+DROP TABLE IF EXISTS users;
+
+DROP TYPE IF EXISTS user_status_enum;
+DROP TYPE IF EXISTS otp_status_enum;
